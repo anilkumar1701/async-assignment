@@ -17,6 +17,9 @@ exports.sendCustomResponse = function(res, message, code, data, apiReference, me
     //res.send(response)
 };
 
+
+
+
 exports.responseMessageCode = {
     PARAMETER_MISSING       : 'PARAMETER_MISSING',
     NO_RECORDS_FOUND        : 'NO RECORDS FOUND IN DB',
