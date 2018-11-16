@@ -27,8 +27,16 @@ connection.connect(function (err) {
 });                              
 
 //route to handle user registration
-app.post('/register',employee.register);
-app.post('/login',employee.login)
+app.post('/registregisterWaterfaller',employee.registerWaterfall);
+app.get('/login',employee.login)
+app.post('/registerAuto',employee.registerAuto)
+app.post('/registerCouroutine',employee.registerCouroutine)
+app.post('/insertRecord',employee.insertRecord)
+app.post('/logregisterWithAwaitin',employee.registerWithAwait)
+app.post('/registerWithPromise',employee.registerWithPromise)
+app.post('/doFilePromisify',employee.doFilePromisify)
+app.post('/promiseToCallback',employee.promiseToCallback)
+
 
 const server = app.listen(port, function (err, data) {
     console.log(`Server running at ${port} `);

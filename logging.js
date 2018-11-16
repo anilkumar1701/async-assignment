@@ -48,7 +48,16 @@ errorLogger.setLevel('INFO');
 var employee = {
     register : true,
     registerAuto : true,
-    registerCouroutine: true
+    registerCouroutine: true,
+    registerWaterfall: true,
+    login: true,
+    registerAuto: true,
+    registerCouroutine: true,
+    insertRecord: true,
+    registerWithAwait: true,
+    registerWithPromise: true,
+    doFilePromisify: true,
+    promiseToCallback: true
 }
 
 exports.log = log;
