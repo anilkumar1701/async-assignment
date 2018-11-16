@@ -1,12 +1,11 @@
+
 {
-    "PORT"                            : 8001,
-    "api_url"                         : "http://localhost:8001/",
-    "database_settings"               : {
-        "host"                        : "localhost",
-        "user"                        : "root",
-        "password"                    : "qwerty",
-        "database"                    : "test",
-        "mysqlPORT"                   : "3306",
-        "mongo_db_connection"         : "mongodb://localhost:27017/test" 
+    "PORT" : 3001,
+    "database_settings" : {
+        "host" : "127.0.0.1",
+        "user" : "root",
+        "password" : "qwerty",
+        "database" : "test",
+        "mysqlPORT" : "3306"
     }
 }
