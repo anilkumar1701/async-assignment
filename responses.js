@@ -17,6 +17,25 @@ exports.sendCustomResponse = function(res, message, code, data, apiReference, me
     //res.send(response)
 };
 
+exports.executeSqlQueryPromisify = function (apiReference, sqlQuery, sqlParams) {
+    return new Promise((resolve, reject) => {
+        connection.query(sqlQuery, sqlParams, function (sqlError, sqlResult) {
+            logging.log(apiReference, {
+                EVENT : "Executing Query",
+                QUERY : this.sql.replace(/\n/g, ' '),
+                sqlParams : sqlParams,
+                ERROR : sqlError,
+                RESULT: sqlResult
+            });
+            if (sqlError) {
+                console.log(sqlError)
+                return reject(new Error(JSON.stringify(responses.getErrorResponse())));
+            }
+            return resolve(sqlResult);
+        })
+    })
+};
+
 
 
 
