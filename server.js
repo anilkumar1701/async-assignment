@@ -26,7 +26,7 @@ connection.connect(function (err) {
     }                                    
 });                              
 
-//route to handle user registration
+//routes for async functions
 app.post('/registregisterWaterfaller',employee.registerWaterfall);
 app.get('/login',employee.login)
 app.post('/registerAuto',employee.registerAuto)
@@ -36,7 +36,7 @@ app.post('/logregisterWithAwaitin',employee.registerWithAwait)
 app.post('/registerWithPromise',employee.registerWithPromise)
 app.post('/doFilePromisify',employee.doFilePromisify)
 app.post('/promiseToCallback',employee.promiseToCallback)
-
+app.post('/exampleSetImmediate',employee.exampleSetImmediate)
 
 const server = app.listen(port, function (err, data) {
     console.log(`Server running at ${port} `);

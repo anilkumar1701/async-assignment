@@ -8,8 +8,8 @@ var logging = require("./logging");
 var responses = require("./responses");
 const readFile = util.promisify(fs.readFile);
 var commonFunc = require("./commonFunction");
-const setImmediatePromise = util.promisify(setImmediate);
 
+//login
 function login(req, res) {
   var employee_email = req.body.email;
   var password = req.body.password;
@@ -46,7 +46,7 @@ function login(req, res) {
   });
 }
 
-
+//registerWaterfall
 function registerWaterfall(req, res) {
   var apiReference = {
     module: apiReferenceModule,
@@ -133,7 +133,7 @@ function registerWaterfall(req, res) {
       }
     })
 }
-
+//registerAuto
 function registerAuto(req, res) {
   var apiReference = {
     module: apiReferenceModule,
@@ -211,6 +211,7 @@ function registerAuto(req, res) {
   })
 }
 
+//registerCouroutine
 async function registerCouroutine(req, res) {
   var apiReference = {
     module: apiReferenceModule,
@@ -252,7 +253,7 @@ async function registerCouroutine(req, res) {
       responses.responseFlags.ERROR, {}, apiReference);  })
 }
 
-
+//registerWithAwait
 async function registerWithAwait(req, res) {
   var apiReference = {
     module: apiReferenceModule,
@@ -302,6 +303,7 @@ async function registerWithAwait(req, res) {
   }
 }
 
+//registerWithPromise
 async function registerWithPromise(req, res) {
   var apiReference = {
     module: apiReferenceModule,
@@ -352,7 +354,7 @@ async function registerWithPromise(req, res) {
   })
 }
 
-
+//doFilePromisify
 async function doFilePromisify() {
   try {
     const text = await readFile('./index.js', 'utf8');
@@ -363,7 +365,7 @@ async function doFilePromisify() {
 }
 doFilePromisify();
 
-
+//promiseToCallback
 function promiseToCallback() {
   var apiReference = {
     module: apiReferenceModule,
@@ -428,6 +430,7 @@ function promiseToCallback() {
                 });
 }
 
+//fn to getemployee 
 function getEmployee(email) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT * FROM employee WHERE email = ?`;
@@ -440,6 +443,7 @@ function getEmployee(email) {
   });
 }
 
+//fn to insertRecord
 function insertRecord(response) {
   return new Promise((resolve, reject) => {
     var sql = `INSERT INTO employee values ?`;
@@ -452,7 +456,32 @@ function insertRecord(response) {
   });
 }
 
+//exampleSetImmediate
+function exampleSetImmediate(req, res){
+  setTimeout(function(){
+    console.log('status 5'); // wait like a normal fn
+  }, 0);
+  
+  setImmediate(function(){
+    console.log('status 4'); 
+    // It will get to last and be take care of first 
+    // will be always before of setInterval(, 0)
+  });
+    
+  console.log('status 1');
+  console.log('status 2');
 
+  //another example
+  fs.readFile("my-file-path.txt", function() {
+    setTimeout(function(){
+        console.log("SETTIMEOUT");
+    });
+    setImmediate(function(){
+        console.log("SETIMMEDIATE");
+    });
+});
+
+}
 
 
 
@@ -465,7 +494,8 @@ module.exports = {
   registerWithAwait,
   registerWithPromise,
   doFilePromisify,
-  promiseToCallback
+  promiseToCallback,
+  exampleSetImmediate
 
 
 
