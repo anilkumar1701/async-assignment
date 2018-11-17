@@ -107,7 +107,7 @@ function registerWaterfall(req, res) {
       }
     },
     function (callback) {
-      var params = [response.employee_name, response.email, response.password, response.created, response.modified];
+      var params = [response.employee_name, response.email, response.password, created, modified];
       var insert = "INSERT into employee (employee.name, email,password, created) values ?";
       connection.query(insert, params, function (err, data) {
         if (err) {
@@ -227,7 +227,7 @@ async function registerCouroutine(req, res) {
   }
 
   Promise.coroutine(function* () {
-    var getResult = yield getEmployee(response.email);
+    var getResult = yield getEmployees(response.email);
     if (getResult && getResult.length > 0) {
       var response = {
         message: "user with email exist",
@@ -236,7 +236,7 @@ async function registerCouroutine(req, res) {
       res.send(JSON.stringify(response));
     }
 
-    var insertRecord = yield insertRecord(response);
+    var insertRecord = yield insertRecords(response);
     if (insertRecord.affectedRows == 1) {
       var response = {
         "message": "Successfully inserted successfully.",
@@ -282,16 +282,16 @@ async function registerWithAwait(req, res) {
       responses.responseFlags.PARAMETER_MISSING, {}, apiReference);  }
 
   try {
-    let getEmployee = await getEmployee("employee", response.email);
+    let getEmployee = await getEmployees("employee", response.email);
     if (!getEmployee) {
       return responses.sendCustomResponse(res, responses.responseMessageCode.NOT_FOUND,
         responses.responseFlags.NOT_FOUND, {}, apiReference);    }
 
-    let insertEmployee = await insertEmployee("employee", response);
+    let insertEmployee = await insertRecords("employee", response);
     if (insertEmployee.affectedRows == 1) {
       return responses.sendCustomResponse(res, responses.responseMessageCode.DATA_INSERTED,
         responses.responseFlags.SUCCESS, {}, apiReference);    }    
-    let getEmployee = await getEmployee("employee", response.email);
+    let getEmployee = await getEmployees("employee", response.email);
     if (getEmployee) {
       return responses.sendCustomResponse(res, responses.responseMessageCode.DATA_RETRIEVED,
         responses.responseFlags.SUCCESS, {}, apiReference);    }
@@ -332,16 +332,20 @@ async function registerWithPromise(req, res) {
   }
 
   const promise = new Promise((resolve, reject) => {
-    let getEmployee = await getEmployee("employee", response.email);
+    let sqlQuery = `SELECT * FROM employee WHERE email = ?`;
+    var getEmployee = await responses.executeSqlQueryPromisify(apiReference, sqlQuery, [response.email]);
     if (!getEmployee) {
       return responses.responseMessageCode.NO_RECORDS_FOUND;
     }
 
-    let insertEmployee = await insertEmployee("employee", response);
+    let sqlQuery = "INSERT INTO employee" +
+    " ( employee_name, email, password, created, modified ) " +
+    " VALUES ( ?,?,?,?,?)";
+    var insertEmployee = await responses.executeSqlQueryPromisify(apiReference, sqlQuery, [response.employee_name, response.email, response.password, created, modified]);
     if (insertEmployee.affectedRows == 1) {
       return responses.responseMessageCode.DATA_INSERTED;
     }
-    let getEmployee = await getEmployee("employee", response.email);
+    let getEmployee = yield getEmployees("employee", response.email);
     if (getEmployee.length) {
       resolve(getEmployee)
     } else {
@@ -396,7 +400,7 @@ function promiseToCallback() {
   async.series({
     getData: function (cb) {
       Promise.coroutine(function* () {
-        let getEmployee = yield getEmployee("employee", response.email);
+        let getEmployee = yield getEmployees("employee", response.email);
         if (!getEmployee) {
           return responses.responseMessageCode.NO_RECORDS_FOUND;
         }
@@ -408,7 +412,7 @@ function promiseToCallback() {
     },
     insertData: function (cb) {
       Promise.coroutine(function* () {
-        let insertEmployee = yield insertEmployee("employee", response);
+        let insertEmployee = yield insertRecords("employee", response);
         if (insertEmployee.affectedRows == 1) {
           return responses.sendCustomResponse(res, responses.responseMessageCode.DATA_INSERTED,
             responses.responseFlags.SUCCESS, {}, apiReference);        }
@@ -431,7 +435,7 @@ function promiseToCallback() {
 }
 
 //fn to getemployee 
-function getEmployee(email) {
+function getEmployees(email) {
   return new Promise((resolve, reject) => {
     var sql = `SELECT * FROM employee WHERE email = ?`;
     connection.query(sql, email, function (error, result) {
@@ -444,10 +448,12 @@ function getEmployee(email) {
 }
 
 //fn to insertRecord
-function insertRecord(response) {
+function insertRecords(response) {
   return new Promise((resolve, reject) => {
-    var sql = `INSERT INTO employee values ?`;
-    connection.query(sql, [response], function (error, result) {
+    var sql = "INSERT INTO employee" +
+    " ( employee_name, email, password, created, modified ) " +
+    " VALUES ( ?,?,?,?,?)";;
+    connection.query(sql, [response.employee_name, response.email, response.password, created, modified], function (error, result) {
       if (error) {
         return reject(error);
       }
@@ -490,7 +496,8 @@ module.exports = {
   login,
   registerAuto,
   registerCouroutine,
-  insertRecord,
+  insertRecords,
+  insertEmployees,
   registerWithAwait,
   registerWithPromise,
   doFilePromisify,
