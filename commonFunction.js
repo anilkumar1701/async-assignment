@@ -11,8 +11,8 @@ exports.checkBlank = function (arr) {
         return 1;
     }
 
-    var arrlength = arr.length;
-    for (var i = 0; i < arrlength; i++) {
+    let arrlength = arr.length;
+    for (let i = 0; i < arrlength; i++) {
         if (arr[i] === undefined || arr[i] == null) {
             arr[i] = "";
         } else {

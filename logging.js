@@ -1,7 +1,7 @@
-var debugging_enabled     = true;
-var new_debugging_enabled = true;
+let debugging_enabled = true;
+let new_debugging_enabled = true;
 
-var moment = require('moment');
+let moment = require('moment');
 
 exports.logDatabaseQueryError = function (eventFired, error, result) {
     if (debugging_enabled) {
@@ -18,36 +18,36 @@ exports.consolelog = function (eventFired, error, result) {
     }
 };
 
-var log4js = require('log4js');
+let log4js = require('log4js');
 log4js.clearAppenders();
 
 log4js.configure({
     appenders: [
         {
-            type                : 'dateFile',
-            filename            : config.get('logFiles.allLogsFilePath'),
-            pattern             : '-yyyy-MM-dd',
-            category            : 'all_logs',
+            type: 'dateFile',
+            filename: config.get('logFiles.allLogsFilePath'),
+            pattern: '-yyyy-MM-dd',
+            category: 'all_logs',
             alwaysIncludePattern: true
         },
         {
-            type                : 'dateFile',
-            filename            : config.get('logFiles.errorLogsFilePath'),
-            pattern             : '-yyyy-MM-dd',
-            category            : 'error_logs',
+            type: 'dateFile',
+            filename: config.get('logFiles.errorLogsFilePath'),
+            pattern: '-yyyy-MM-dd',
+            category: 'error_logs',
             alwaysIncludePattern: true
         }
     ]
 });
 
-var logger        = log4js.getLogger('all_logs');
-var errorLogger   = log4js.getLogger('error_logs');
+let logger = log4js.getLogger('all_logs');
+let errorLogger = log4js.getLogger('error_logs');
 logger.setLevel('INFO');
 errorLogger.setLevel('INFO');
 
-var employee = {
-    register : true,
-    registerAuto : true,
+let employee = {
+    register: true,
+    registerAuto: true,
     registerCouroutine: true,
     registerWaterfall: true,
     login: true,

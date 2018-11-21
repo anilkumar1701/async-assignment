@@ -1,18 +1,18 @@
-var apiReferenceModule = "employee";
-var Promise = require('bluebird');
-var Joi = require('joi');
+let apiReferenceModule = "employee";
+let Promise = require('bluebird');
+let Joi = require('joi');
 const async = require('async');
-var fs = require('fs');
+let fs = require('fs');
 const util = require('util');
-var logging = require("./logging");
-var responses = require("./responses");
+let logging = require("./logging");
+let responses = require("./responses");
 const readFile = util.promisify(fs.readFile);
-var commonFunc = require("./commonFunction");
+let commonFunc = require("./commonFunction");
 
 //login
 function login(req, res) {
-  var employee_email = req.body.email;
-  var password = req.body.password;
+  let employee_email = req.body.email;
+  let password = req.body.password;
   connection.query('SELECT * FROM employee WHERE email = ?', [employee_email], function (error, results, fields) {
     if (error) {
       // console.log("error ocurred",error);
@@ -48,12 +48,12 @@ function login(req, res) {
 
 //registerWaterfall
 function registerWaterfall(req, res) {
-  var apiReference = {
+  let apiReference = {
     module: apiReferenceModule,
     api: "register"
   };
-  var today = new Date();
-  var response = {
+  let today = new Date();
+  let response = {
     employee_name: req.employee_name,
     email: req.query.email,
     password: req.query.password,
@@ -61,7 +61,7 @@ function registerWaterfall(req, res) {
     modified: today
   };
 
-  var schema = Joi.object().keys({
+  let schema = Joi.object().keys({
     employee_name: Joi.string().required(),
     email: Joi.string().required(),
     password: Joi.any().required(),
@@ -69,7 +69,7 @@ function registerWaterfall(req, res) {
     modified: Joi.Date()
   });
 
-  var validateReq = Joi.validate({ name, email, password }, schema);
+  let validateReq = Joi.validate({ name, email, password }, schema);
   if (validateReq.error) {
     return responses.responseMessageCode.PARAMETER_MISSING;
   }
@@ -82,7 +82,7 @@ function registerWaterfall(req, res) {
         REQ_BODY: req.body
       });
 
-      var result = [employee_name, email];
+      let result = [employee_name, email];
       if (commonFunc.checkBlank(result)) {
         return responses.sendCustomResponse(res, responses.responseMessageCode.PARAMETER_MISSING,
           responses.responseFlags.PARAMETER_MISSING, {}, apiReference);
@@ -107,8 +107,8 @@ function registerWaterfall(req, res) {
       }
     },
     function (callback) {
-      var params = [response.employee_name, response.email, response.password, created, modified];
-      var insert = "INSERT into employee (employee.name, email,password, created) values ?";
+      let params = [response.employee_name, response.email, response.password, created, modified];
+      let insert = "INSERT into employee (employee.name, email,password, created) values ?";
       connection.query(insert, params, function (err, data) {
         if (err) {
           cb(err);
@@ -117,10 +117,12 @@ function registerWaterfall(req, res) {
       });
     },
     function (data, callback) {
+      console.log(data, data)
       connection.query('select * from employee where email = ?', [response.email], function (err, result) {
-        if (err) throw err;
-
-        callback(null, result)
+        if (err) 
+        throw err;
+        else
+        {callback(null, result)}
       })
     }],
     function (err, result) {
@@ -129,18 +131,18 @@ function registerWaterfall(req, res) {
         return responses.responseMessageCode.ERROR;
       }
       if (result.affectedRows == 1) {
-        return responses.sendCustomResponse(res, "ERROR", responses.responseFlags.ERROR, {}, apiReference)
+        return responses.sendCustomResponse(res, "SUCCESS", responses.responseMessageCode.ERROR, {}, apiReference)
       }
     })
 }
 //registerAuto
 function registerAuto(req, res) {
-  var apiReference = {
+  let apiReference = {
     module: apiReferenceModule,
     api: "registerAuto"
   };
-  var today = new Date();
-  var response = {
+  let today = new Date();
+  let response = {
     employee_name: req.employee_name,
     email: req.query.email,
     password: req.query.password,
@@ -148,7 +150,7 @@ function registerAuto(req, res) {
     modified: today
   };
 
-  var schema = Joi.object().keys({
+  let schema = Joi.object().keys({
     employee_name: Joi.string().required(),
     email: Joi.string().required(),
     password: Joi.any().required(),
@@ -156,20 +158,20 @@ function registerAuto(req, res) {
     modified: Joi.Date()
   });
 
-  var validateReq = Joi.validate({ employee_name, email, password }, schema);
+  let validateReq = Joi.validate({ employee_name, email, password }, schema);
   if (validateReq.error) {
     return responses.responseMessageCode.PARAMETER_MISSING;
   }
 
   async.auto({
-    
+
     checkData: function (cb) {
       logging.log(apiReference, {
         EVENT: "CHECK FOR REQBODY AND MAN DATA",
         REQ_BODY: req.body
       });
 
-      var result = [employee_name, email];
+      let result = [employee_name, email];
       if (commonFunc.checkBlank(result)) {
         return responses.sendCustomResponse(res, responses.responseMessageCode.PARAMETER_MISSING,
           responses.responseFlags.PARAMETER_MISSING, {}, apiReference);
@@ -182,15 +184,15 @@ function registerAuto(req, res) {
         data = [];
         cb();
       }
-      var response = {
+      let response = {
         "message": "Email exists",
         "status": 201,
       };
       res.send(JSON.stringify(response));
     }],
-    insertData: ['Fetch', function (cb, result) {
-      var params = [response.employee_name, response.email, response.password, response.created];
-      var insert = "INSERT into employee (employee_name, email, password, created) values ?";
+    insertData: ['Fetch', 'checkData', function (cb, result) {
+      let params = [response.employee_name, response.email, response.password, response.created];
+      let insert = "INSERT into employee (employee_name, email, password, created) values ?";
       connection.query(insert, params, function (err, data) {
         if (err) {
           cb(err);
@@ -213,12 +215,12 @@ function registerAuto(req, res) {
 
 //registerCouroutine
 async function registerCouroutine(req, res) {
-  var apiReference = {
+  let apiReference = {
     module: apiReferenceModule,
     api: "registerCouroutine"
   };
-  var today = new Date();
-  var response = {
+  let today = new Date();
+  let response = {
     employee_name: req.employee_name,
     email: req.query.email,
     password: req.query.password,
@@ -227,40 +229,42 @@ async function registerCouroutine(req, res) {
   }
 
   Promise.coroutine(function* () {
-    var getResult = yield getEmployees(response.email);
+    let getResult = yield getEmployees(response.email);
     if (getResult && getResult.length > 0) {
-      var response = {
+      let response = {
         message: "user with email exist",
         status: 400
       };
       res.send(JSON.stringify(response));
     }
 
-    var insertRecord = yield insertRecords(response);
+    let insertRecord = yield insertRecords(response);
     if (insertRecord.affectedRows == 1) {
-      var response = {
+      let response = {
         "message": "Successfully inserted successfully.",
         "status": 200,
       };
       res.send(JSON.stringify(response));
     }
   })().then(result => {
+    console.log(result, result);
     return responses.sendCustomResponse(res, responses.responseMessageCode.ACTION_COMPLETE,
-      responses.responseFlags.SUCCESS, {}, apiReference); 
-     }).catch(error => {
-    console.log("error", error);
+      responses.responseFlags.SUCCESS, {}, apiReference);
+  }).catch(error => {
+    console.log(error, error);
     return responses.sendCustomResponse(res, responses.responseMessageCode.ERROR,
-      responses.responseFlags.ERROR, {}, apiReference);  })
+      responses.responseFlags.ERROR, {}, apiReference);
+  })
 }
 
 //registerWithAwait
 async function registerWithAwait(req, res) {
-  var apiReference = {
+  let apiReference = {
     module: apiReferenceModule,
     api: "registerAuto"
   };
-  var today = new Date();
-  var response = {
+  let today = new Date();
+  let response = {
     employee_name: req.employee_name,
     email: req.query.email,
     password: req.query.password,
@@ -268,7 +272,7 @@ async function registerWithAwait(req, res) {
     modified: today
   };
 
-  var schema = Joi.object().keys({
+  let schema = Joi.object().keys({
     employee_name: Joi.string().required(),
     email: Joi.string().required(),
     password: Joi.any().required(),
@@ -276,25 +280,29 @@ async function registerWithAwait(req, res) {
     modified: Joi.Date()
   });
 
-  var validateReq = Joi.validate({ name, email, password }, schema);
+  let validateReq = Joi.validate({ name, email, password }, schema);
   if (validateReq.error) {
     return responses.sendCustomResponse(res, responses.responseMessageCode.PARAMETER_MISSING,
-      responses.responseFlags.PARAMETER_MISSING, {}, apiReference);  }
+      responses.responseFlags.PARAMETER_MISSING, {}, apiReference);
+  }
 
   try {
     let getEmployee = await getEmployees("employee", response.email);
     if (!getEmployee) {
       return responses.sendCustomResponse(res, responses.responseMessageCode.NOT_FOUND,
-        responses.responseFlags.NOT_FOUND, {}, apiReference);    }
+        responses.responseFlags.NOT_FOUND, {}, apiReference);
+    }
 
     let insertEmployee = await insertRecords("employee", response);
     if (insertEmployee.affectedRows == 1) {
       return responses.sendCustomResponse(res, responses.responseMessageCode.DATA_INSERTED,
-        responses.responseFlags.SUCCESS, {}, apiReference);    }    
+        responses.responseFlags.SUCCESS, {}, apiReference);
+    }
     let getEmployee = await getEmployees("employee", response.email);
     if (getEmployee) {
       return responses.sendCustomResponse(res, responses.responseMessageCode.DATA_RETRIEVED,
-        responses.responseFlags.SUCCESS, {}, apiReference);    }
+        responses.responseFlags.SUCCESS, {}, apiReference);
+    }
 
   } catch (err) {
     console.log(err)
@@ -305,12 +313,12 @@ async function registerWithAwait(req, res) {
 
 //registerWithPromise
 async function registerWithPromise(req, res) {
-  var apiReference = {
+  let apiReference = {
     module: apiReferenceModule,
     api: "registerAuto"
   };
-  var today = new Date();
-  var response = {
+  let today = new Date();
+  let response = {
     employee_name: req.employee_name,
     email: req.query.email,
     password: req.query.password,
@@ -318,7 +326,7 @@ async function registerWithPromise(req, res) {
     modified: today
   };
 
-  var schema = Joi.object().keys({
+  let schema = Joi.object().keys({
     employee_name: Joi.string().required(),
     email: Joi.string().required(),
     password: Joi.any().required(),
@@ -326,26 +334,26 @@ async function registerWithPromise(req, res) {
     modified: Joi.Date()
   });
 
-  var validateReq = Joi.validate({ name, email, password }, schema);
+  let validateReq = Joi.validate({ name, email, password }, schema);
   if (validateReq.error) {
     return responses.responseMessageCode.PARAMETER_MISSING;
   }
 
   const promise = new Promise((resolve, reject) => {
     let sqlQuery = `SELECT * FROM employee WHERE email = ?`;
-    var getEmployee = await responses.executeSqlQueryPromisify(apiReference, sqlQuery, [response.email]);
+    let getEmployee = await responses.executeSqlQueryPromisify(apiReference, sqlQuery, [response.email]);
     if (!getEmployee) {
       return responses.responseMessageCode.NO_RECORDS_FOUND;
     }
 
     let sqlQuery = "INSERT INTO employee" +
-    " ( employee_name, email, password, created, modified ) " +
-    " VALUES ( ?,?,?,?,?)";
-    var insertEmployee = await responses.executeSqlQueryPromisify(apiReference, sqlQuery, [response.employee_name, response.email, response.password, created, modified]);
+      " ( employee_name, email, password, created, modified ) " +
+      " VALUES ( ?,?,?,?,?)";
+    let insertEmployee = await responses.executeSqlQueryPromisify(apiReference, sqlQuery, [response.employee_name, response.email, response.password, created, modified]);
     if (insertEmployee.affectedRows == 1) {
       return responses.responseMessageCode.DATA_INSERTED;
     }
-    let getEmployee = yield getEmployees("employee", response.email);
+    let getEmployee = await getEmployees("employee", response.email);
     if (getEmployee.length) {
       resolve(getEmployee)
     } else {
@@ -353,6 +361,7 @@ async function registerWithPromise(req, res) {
     }
   });
   promise.then(function (results) {
+    console.log('results', results)
   }).catch(function (error) {
     console.log('error');
   })
@@ -371,12 +380,12 @@ doFilePromisify();
 
 //promiseToCallback
 function promiseToCallback() {
-  var apiReference = {
+  let apiReference = {
     module: apiReferenceModule,
     api: "registerAuto"
   };
-  var today = new Date();
-  var response = {
+  let today = new Date();
+  let response = {
     employee_name: req.employee_name,
     email: req.query.email,
     password: req.query.password,
@@ -384,7 +393,7 @@ function promiseToCallback() {
     modified: today
   };
 
-  var schema = Joi.object().keys({
+  let schema = Joi.object().keys({
     employee_name: Joi.string().required(),
     email: Joi.string().required(),
     password: Joi.any().required(),
@@ -392,7 +401,7 @@ function promiseToCallback() {
     modified: Joi.Date()
   });
 
-  var validateReq = Joi.validate({ name, email, password }, schema);
+  let validateReq = Joi.validate({ name, email, password }, schema);
   if (validateReq.error) {
     return responses.responseMessageCode.PARAMETER_MISSING;
   }
@@ -415,7 +424,8 @@ function promiseToCallback() {
         let insertEmployee = yield insertRecords("employee", response);
         if (insertEmployee.affectedRows == 1) {
           return responses.sendCustomResponse(res, responses.responseMessageCode.DATA_INSERTED,
-            responses.responseFlags.SUCCESS, {}, apiReference);        }
+            responses.responseFlags.SUCCESS, {}, apiReference);
+        }
       })().then(function (result) {
         cb(null, result);
       }, function (error) {
@@ -428,16 +438,16 @@ function promiseToCallback() {
       if (error) {
         return responses.sendCustomResponse(res, responses.responseMessageCode.ERROR,
           responses.responseFlags.ERROR, {}, apiReference);
-              }
-              return responses.sendCustomResponse(res, responses.responseMessageCode.SUCCESS,
-                responses.responseFlags.SUCCESS, {}, apiReference);  
-                });
+      }
+      return responses.sendCustomResponse(res, responses.responseMessageCode.SUCCESS,
+        responses.responseFlags.SUCCESS, {}, apiReference);
+    });
 }
 
 //fn to getemployee 
 function getEmployees(email) {
   return new Promise((resolve, reject) => {
-    var sql = `SELECT * FROM employee WHERE email = ?`;
+    let sql = `SELECT * FROM employee WHERE email = ?`;
     connection.query(sql, email, function (error, result) {
       if (error) {
         return reject(error);
@@ -450,9 +460,9 @@ function getEmployees(email) {
 //fn to insertRecord
 function insertRecords(response) {
   return new Promise((resolve, reject) => {
-    var sql = "INSERT INTO employee" +
-    " ( employee_name, email, password, created, modified ) " +
-    " VALUES ( ?,?,?,?,?)";;
+    let sql = "INSERT INTO employee" +
+      " ( employee_name, email, password, created, modified ) " +
+      " VALUES ( ?,?,?,?,?)";;
     connection.query(sql, [response.employee_name, response.email, response.password, created, modified], function (error, result) {
       if (error) {
         return reject(error);
@@ -463,33 +473,37 @@ function insertRecords(response) {
 }
 
 //exampleSetImmediate
-function exampleSetImmediate(req, res){
-  setTimeout(function(){
+function exampleSetImmediate(req, res) {
+  setTimeout(function () {
     console.log('status 5'); // wait like a normal fn
   }, 0);
-  
-  setImmediate(function(){
-    console.log('status 4'); 
+
+  setImmediate(function () {
+    console.log('status 4');
     // It will get to last and be take care of first 
     // will be always before of setInterval(, 0)
   });
-    
+
   console.log('status 1');
   console.log('status 2');
 
   //another example
-  fs.readFile("my-file-path.txt", function() {
-    setTimeout(function(){
-        console.log("SETTIMEOUT");
+  fs.readFile("my-file-path.txt", function () {
+    setTimeout(function () {
+      console.log("SETTIMEOUT");
     });
-    setImmediate(function(){
-        console.log("SETIMMEDIATE");
+    setImmediate(function () {
+      console.log("SETIMMEDIATE");
     });
-});
+  });
 
 }
-
-
+/*The main advantage to using setImmediate() over setTimeout() is setImmediate()
+will always be executed before any timers if scheduled within an I/O cycle,
+independently of how many timers are present.
+Timers cannot guaranteed when its callback gets executed even though the timer expiration period is zero,
+immediates queue is guaranteed to be processed immediately after the I/O phase of the event loop.
+*/
 
 module.exports = {
   registerWaterfall,
