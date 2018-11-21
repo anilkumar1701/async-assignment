@@ -486,7 +486,7 @@ function exampleSetImmediate(req, res) {
 
   console.log('status 1');
   console.log('status 2');
-  console.log('status changed')
+
   //another example
   fs.readFile("my-file-path.txt", function () {
     setTimeout(function () {
@@ -504,7 +504,6 @@ independently of how many timers are present.
 Timers cannot guaranteed when its callback gets executed even though the timer expiration period is zero,
 immediates queue is guaranteed to be processed immediately after the I/O phase of the event loop.
 */
-
 
 module.exports = {
   registerWaterfall,
