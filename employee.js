@@ -486,7 +486,7 @@ function exampleSetImmediate(req, res) {
 
   console.log('status 1');
   console.log('status 2');
-
+  console.log('status changed')
   //another example
   fs.readFile("my-file-path.txt", function () {
     setTimeout(function () {
